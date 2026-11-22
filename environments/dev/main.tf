@@ -1,36 +1,15 @@
 # -----------------------------------------------------------------------------
-# Dev environment: settings
-# All dev-specific values live here, so the modules stay reusable.
+# Dev environment
+# Values come from terraform.tfvars (see example.tfvars for a template),
+# so the modules stay reusable.
 # -----------------------------------------------------------------------------
-locals {
-  environment = "dev"
-  aws_region  = "us-east-1"
-
-  # Network (must not overlap with staging or prod if they are ever peered)
-  vpc_cidr            = "10.0.0.0/16"
-  public_subnet_cidr  = "10.0.1.0/24"
-  private_subnet_cidr = "10.0.2.0/24"
-  availability_zone   = "us-east-1a" # both subnets in one AZ: cheaper, less resilient
-
-  # Security
-  app_port = 8080
-
-  # Compute (smallest sensible size for dev)
-  frontend_instance_type = "t3.micro"
-  backend_instance_type  = "t3.micro"
-
-  # Extra tags added to every resource (modules add Environment, Project, etc.)
-  tags = {
-    Owner = "CloudOps Team"
-  }
-}
 
 # -----------------------------------------------------------------------------
 # AWS provider
 # Credentials come from your AWS CLI profile or environment, never from code.
 # -----------------------------------------------------------------------------
 provider "aws" {
-  region = local.aws_region
+  region = var.aws_region
 }
 
 # -----------------------------------------------------------------------------
@@ -39,13 +18,13 @@ provider "aws" {
 module "network" {
   source = "../../modules/network"
 
-  environment         = local.environment
-  vpc_cidr            = local.vpc_cidr
-  public_subnet_cidr  = local.public_subnet_cidr
-  private_subnet_cidr = local.private_subnet_cidr
-  public_subnet_az    = local.availability_zone
-  private_subnet_az   = local.availability_zone
-  tags                = local.tags
+  environment         = var.environment
+  vpc_cidr            = var.vpc_cidr
+  public_subnet_cidr  = var.public_subnet_cidr
+  private_subnet_cidr = var.private_subnet_cidr
+  public_subnet_az    = var.availability_zone
+  private_subnet_az   = var.availability_zone
+  tags                = var.tags
 }
 
 # -----------------------------------------------------------------------------
@@ -54,11 +33,11 @@ module "network" {
 module "security" {
   source = "../../modules/security"
 
-  environment    = local.environment
+  environment    = var.environment
   vpc_id         = module.network.vpc_id
   vpc_cidr_block = module.network.vpc_cidr_block
-  app_port       = local.app_port
-  tags           = local.tags
+  app_port       = var.app_port
+  tags           = var.tags
 }
 
 # -----------------------------------------------------------------------------
@@ -67,12 +46,12 @@ module "security" {
 module "compute" {
   source = "../../modules/compute"
 
-  environment                = local.environment
+  environment                = var.environment
   public_subnet_id           = module.network.public_subnet_id
   private_subnet_id          = module.network.private_subnet_id
   frontend_security_group_id = module.security.frontend_security_group_id
   backend_security_group_id  = module.security.backend_security_group_id
-  frontend_instance_type     = local.frontend_instance_type
-  backend_instance_type      = local.backend_instance_type
-  tags                       = local.tags
+  frontend_instance_type     = var.frontend_instance_type
+  backend_instance_type      = var.backend_instance_type
+  tags                       = var.tags
 }
