@@ -41,6 +41,16 @@ module "security" {
 }
 
 # -----------------------------------------------------------------------------
+# IAM: role + instance profile so EC2 can use SSM Session Manager
+# -----------------------------------------------------------------------------
+module "iam" {
+  source = "../../modules/iam"
+
+  environment = var.environment
+  tags        = var.tags
+}
+
+# -----------------------------------------------------------------------------
 # Compute: frontend EC2 (public subnet) and backend EC2 (private subnet)
 # -----------------------------------------------------------------------------
 module "compute" {
@@ -53,5 +63,6 @@ module "compute" {
   backend_security_group_id  = module.security.backend_security_group_id
   frontend_instance_type     = var.frontend_instance_type
   backend_instance_type      = var.backend_instance_type
+  iam_instance_profile_name  = module.iam.ec2_instance_profile_name
   tags                       = var.tags
 }
