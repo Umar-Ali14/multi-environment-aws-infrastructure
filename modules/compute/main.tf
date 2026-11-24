@@ -18,7 +18,6 @@ data "aws_ssm_parameter" "al2023_ami" {
   name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
 }
 
-# Frontend instance (public subnet)
 resource "aws_instance" "frontend" {
   ami                         = data.aws_ssm_parameter.al2023_ami.insecure_value
   instance_type               = var.frontend_instance_type
@@ -26,6 +25,14 @@ resource "aws_instance" "frontend" {
   vpc_security_group_ids      = [var.frontend_security_group_id]
   associate_public_ip_address = true
   iam_instance_profile        = var.iam_instance_profile_name
+
+  # Startup script: installs nginx and writes a test page (runs on first boot).
+  user_data = templatefile("${path.module}/templates/frontend-user-data.sh.tftpl", {
+    environment = var.environment
+  })
+
+  # The script only runs on first boot, so a changed script needs a new instance.
+  user_data_replace_on_change = true
 
   # Require IMDSv2 (session tokens) for the instance metadata service.
   metadata_options {
