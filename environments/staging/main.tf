@@ -66,3 +66,16 @@ module "compute" {
   iam_instance_profile_name  = module.iam.ec2_instance_profile_name
   tags                       = var.tags
 }
+
+# -----------------------------------------------------------------------------
+# Monitoring: CloudWatch alarms (CPU, status checks) and SNS email alerts
+# -----------------------------------------------------------------------------
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  environment          = var.environment
+  frontend_instance_id = module.compute.frontend_instance_id
+  backend_instance_id  = module.compute.backend_instance_id
+  alert_email          = var.alert_email
+  tags                 = var.tags
+}

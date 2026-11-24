@@ -43,6 +43,12 @@ variable "backend_instance_type" {
   type        = string
 }
 
+variable "alert_email" {
+  description = "Email address for CloudWatch alarm notifications. Leave null for no email."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "Extra tags added to every resource (modules add Environment, Project, etc.)."
   type        = map(string)

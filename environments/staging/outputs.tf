@@ -51,3 +51,16 @@ output "backend_private_ip" {
   description = "Private IP of the staging backend. Only reachable from the frontend, on the app port."
   value       = module.compute.backend_private_ip
 }
+
+# -----------------------------------------------------------------------------
+# Monitoring
+# -----------------------------------------------------------------------------
+output "alerts_topic_arn" {
+  description = "ARN of the SNS topic that receives alarm notifications."
+  value       = module.monitoring.alerts_topic_arn
+}
+
+output "alarm_names" {
+  description = "Names of the CloudWatch alarms for this environment."
+  value       = module.monitoring.alarm_names
+}
