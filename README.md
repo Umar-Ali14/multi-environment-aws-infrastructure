@@ -53,7 +53,59 @@ There are no real users or revenue in a learning project, so the metrics below a
 
 ## 3. Architecture
 
-Each environment is an identical, isolated copy of this layout, in its own VPC with its own address range.
+Each environment (dev, staging, prod) is an identical, isolated copy of this layout, in its own VPC with its own address range.
+
+### The big picture
+
+A visitor reaches the **frontend** server through the Internet Gateway. The **backend** server sits in a private subnet with no internet access; only the frontend can talk to it.
+
+```mermaid
+flowchart LR
+    user(["👤 Visitor"])
+    subgraph vpc["Your private network in AWS (VPC)"]
+        igw["🚪 Internet Gateway<br/>the network's front door"]
+        subgraph pub["Public subnet"]
+            fe["🖥️ Frontend server<br/>shows the web page"]
+        end
+        subgraph priv["Private subnet (no internet)"]
+            be["🗄️ Backend server<br/>hidden from the internet"]
+        end
+    end
+    user -->|"1. opens the website"| igw
+    igw -->|"2. lets web traffic in"| fe
+    fe -->|"3. only the frontend<br/>may talk to it"| be
+```
+
+### What happens when someone opens the website
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor V as 👤 Visitor (browser)
+    participant G as 🚪 Internet Gateway
+    participant R as 🗺️ Route table
+    participant S as 🛡️ Security Group
+    participant F as 🖥️ Frontend (nginx)
+    V->>G: Types the frontend's public IP into the browser
+    G->>R: Public IP translated to the server's private IP (10.0.1.x)
+    R->>S: Delivered into the public subnet
+    S->>S: Is it port 80 or 443? Yes, allow
+    S->>F: Request reaches the server
+    F-->>V: Sends back the "Hello from dev" page
+    Note over V,F: A request on any other port (for example 22 for SSH)<br/>is silently dropped at step 4
+```
+
+### How the engineer finds out about a problem
+
+```mermaid
+flowchart LR
+    ec2["🖥️ Server<br/>problem: CPU above 80%<br/>or health check fails"] -->|"1. sends metrics<br/>every few minutes"| cw["📈 CloudWatch alarm<br/>notices the problem"]
+    cw -->|"2. triggers"| sns["📨 SNS topic"]
+    sns -->|"3. sends"| mail(["📧 Email to the engineer"])
+```
+
+<details>
+<summary><b>Full architecture diagram (for engineers)</b>: adds IAM, Session Manager and monitoring</summary>
 
 ```mermaid
 flowchart TB
@@ -87,6 +139,10 @@ flowchart TB
     be -.->|metrics| cw
     cw --> sns --> mail
 ```
+
+</details>
+
+### Address ranges and sizes per environment
 
 | Environment | VPC CIDR | Public subnet | Private subnet | Instance size |
 |---|---|---|---|---|
