@@ -9,8 +9,6 @@ This README answers three questions: **what I built**, **why I made each decisio
 ## Tech stack
 <p align="center"> <img src="https://skillicons.dev/icons?i=terraform,aws,linux,nginx,bash,git,github,vscode,ubuntu&perline=9" alt="Terraform, AWS, Linux, nginx, Bash, Git, GitHub, VS Code, Ubuntu" /> </p> <p align="center"> <img src="https://img.shields.io/badge/Amazon_VPC-8C4FFF?style=for-the-badge" alt="Amazon VPC" /> <img src="https://img.shields.io/badge/Amazon_EC2-FF9900?style=for-the-badge" alt="Amazon EC2" /> <img src="https://img.shields.io/badge/AWS_IAM-DD344C?style=for-the-badge" alt="AWS IAM" /> <img src="https://img.shields.io/badge/AWS_Systems_Manager-E7157B?style=for-the-badge" alt="AWS Systems Manager" /> <img src="https://img.shields.io/badge/Amazon_CloudWatch-E7157B?style=for-the-badge" alt="Amazon CloudWatch" /> <img src="https://img.shields.io/badge/Amazon_SNS-E7157B?style=for-the-badge" alt="Amazon SNS" /> <img src="https://img.shields.io/badge/Amazon_Linux_2023-232F3E?style=for-the-badge" alt="Amazon Linux 2023" /> </p>
 
-What each service and tool does in this project, and where it appears in the code: section 4.
-
 ---
 
 ## Contents
