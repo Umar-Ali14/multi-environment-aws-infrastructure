@@ -18,6 +18,9 @@ app_port = 8080
 frontend_instance_type = "t3.micro"
 backend_instance_type  = "t3.micro"
 
+# Monitoring: email for alarm notifications (optional; remove the # to use)
+# alert_email = "you@example.com"
+
 # Extra tags
 tags = {
   Owner = "your-name"
